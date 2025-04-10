@@ -43,6 +43,13 @@
     --sidebar-accent-foreground: 26 31 44;
     --sidebar-border: 214 188 250;
     --sidebar-ring: 110 89 165;
+
+    /* Time travel specific variables */
+    --chrono-primary: 110 89 165;
+    --chrono-secondary: 155 135 245;
+    --chrono-accent: 214 188 250;
+    --chrono-dark: 26 31 44;
+    --time-gradient: linear-gradient(90deg, #9b87f5 0%, #7E69AB 100%);
   }
 
   .dark {
@@ -82,6 +89,13 @@
     --sidebar-accent-foreground: 241 240 251;
     --sidebar-border: 76 81 94;
     --sidebar-ring: 214 188 250;
+
+    /* Time travel specific variables in dark mode */
+    --chrono-primary: 214 188 250;
+    --chrono-secondary: 155 135 245;
+    --chrono-accent: 110 89 165;
+    --chrono-dark: 36 41 54;
+    --time-gradient: linear-gradient(90deg, #9b87f5 0%, #6E59A5 100%);
   }
 }
 
@@ -114,5 +128,52 @@
   
   .timeline-dot {
     @apply absolute left-4 h-3 w-3 -translate-x-1.5 rounded-full bg-chrono-primary border-2 border-white dark:border-chrono-dark;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+
+  .bg-time-gradient {
+    background: var(--time-gradient);
+  }
+
+  .time-ripple {
+    @apply before:absolute before:inset-0 before:rounded-full before:bg-primary/30
+    before:animate-[ripple_1.5s_ease-in_infinite] before:opacity-0;
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

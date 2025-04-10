@@ -1,10 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, Clock, CloudLightning, FileText, History, XCircle } from "lucide-react";
+import { Calendar, CheckCircle, Clock, CloudLightning, FileText, History, XCircle, Hourglass } from "lucide-react";
+import { TimeAxis } from "@/components/timeline/TimeAxis";
+import { CapsuleList } from "@/components/timeline/CapsuleList";
+import { FileVersions } from "@/components/timeline/FileVersions";
+import { toast } from "@/hooks/use-toast";
+import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 
 // Mock data for timeline events
 const timelineEvents = [
@@ -82,8 +87,92 @@ const timelineEvents = [
   },
 ];
 
+// Mock data for capsules
+const capsules = [
+  {
+    id: 1,
+    capsule_name: "Production v1.0.0",
+    capsule_time: "2025-04-10T09:30:00",
+    updated_at: "2025-04-10T09:35:00"
+  },
+  {
+    id: 2,
+    capsule_name: "Development Branch",
+    capsule_time: "2025-04-09T16:20:00",
+    updated_at: "2025-04-09T16:25:00"
+  },
+  {
+    id: 3,
+    capsule_name: "Feature X Stable",
+    capsule_time: "2025-04-08T11:45:00",
+    updated_at: "2025-04-08T11:50:00"
+  }
+];
+
+// Mock data for file versions
+const fileVersions = [
+  {
+    filename: "server.py",
+    versions: [
+      { 
+        time_mark: "2025-04-10T09:30:00", 
+        version: "v1.2.0",
+        base: false 
+      },
+      { 
+        time_mark: "2025-04-09T16:20:00", 
+        version: "v1.1.0",
+        base: false 
+      },
+      { 
+        time_mark: "2025-04-08T11:45:00",
+
+        version: "v1.0.0",
+        base: true 
+      }
+    ]
+  },
+  {
+    filename: "config.json",
+    versions: [
+      { 
+        time_mark: "2025-04-09T18:45:00", 
+        version: "v2.0.0",
+        base: false 
+      },
+      { 
+        time_mark: "2025-04-08T10:30:00", 
+        version: "v1.0.0",
+        base: true 
+      }
+    ]
+  },
+  {
+    filename: "app.js",
+    versions: [
+      { 
+        time_mark: "2025-04-10T09:30:00", 
+        version: "v3.0.0",
+        base: false 
+      },
+      { 
+        time_mark: "2025-04-09T16:20:00", 
+        version: "v2.0.0",
+        base: false 
+      },
+      { 
+        time_mark: "2025-04-08T11:45:00", 
+        version: "v1.0.0",
+        base: true 
+      }
+    ]
+  }
+];
+
 export default function Timeline() {
   const [filter, setFilter] = useState("all");
+  const [selectedTimePoint, setSelectedTimePoint] = useState("");
+  const [activeTab, setActiveTab] = useState("events");
   
   // Format date in a time-focused way
   const formatDate = (dateString: string) => {
@@ -110,40 +199,119 @@ export default function Timeline() {
         return <History className="h-5 w-5" />;
     }
   };
+
+  const handleTimePointSelect = (timePoint: string) => {
+    setSelectedTimePoint(timePoint);
+    toast({
+      title: "Time point selected",
+      description: `You've selected time point: ${formatDate(timePoint)}`,
+    });
+  };
   
   // Filter events based on selected tab
   const filteredEvents = filter === "all" 
     ? timelineEvents 
     : timelineEvents.filter(event => event.type === filter);
   
+  useEffect(() => {
+    // Set the first event's timestamp as default selected time point
+    if (timelineEvents.length > 0 && !selectedTimePoint) {
+      setSelectedTimePoint(timelineEvents[0].timestamp);
+    }
+  }, []);
+
   return (
     <MainLayout>
       <div className="space-y-8 animate-fade-in">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Timeline</h1>
-          <p className="text-muted-foreground">
-            View the history of all changes and events
-          </p>
+        {/* Header with time travel theme */}
+        <div className="relative z-10 mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-lg -z-10 blur-xl"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-indigo-500 text-transparent bg-clip-text">
+                Chrono Timeline
+              </h1>
+              <p className="text-muted-foreground">
+                Navigate through your system's history across time and space
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>Filter by Date</span>
+              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="secondary" size="sm" className="gap-2">
+                    <Hourglass className="h-4 w-4" />
+                    <span>Time Controls</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="sm:max-w-md">
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-semibold">Chrono Control Panel</h3>
+                      <p className="text-sm text-muted-foreground">Manage your time travel operations</p>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Create Time Capsule</h4>
+                        <div className="space-y-2">
+                          <input 
+                            type="text" 
+                            placeholder="Capsule Name"
+                            className="w-full px-3 py-2 border border-input bg-background rounded-md" 
+                          />
+                          <Button className="w-full">Create Capsule at Current Time Point</Button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Jump to Time Point</h4>
+                        <div className="space-y-2">
+                          <input 
+                            type="datetime-local" 
+                            className="w-full px-3 py-2 border border-input bg-background rounded-md" 
+                          />
+                          <Button variant="secondary" className="w-full">Time Jump</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
         </div>
         
-        {/* Filter Tabs */}
-        <Tabs defaultValue="all" value={filter} onValueChange={setFilter}>
+        {/* Time Axis Visualization */}
+        <TimeAxis 
+          events={timelineEvents}
+          selectedTimePoint={selectedTimePoint}
+          onSelectTimePoint={handleTimePointSelect}
+        />
+        
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="events" value={activeTab} onValueChange={setActiveTab}>
           <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="all">All Events</TabsTrigger>
-              <TabsTrigger value="snapshot">Snapshots</TabsTrigger>
-              <TabsTrigger value="deployment">Deployments</TabsTrigger>
-              <TabsTrigger value="config">Configurations</TabsTrigger>
+            <TabsList className="grid grid-cols-3 w-[400px]">
+              <TabsTrigger value="events">Events</TabsTrigger>
+              <TabsTrigger value="capsules">Capsules</TabsTrigger>
+              <TabsTrigger value="files">File Versions</TabsTrigger>
             </TabsList>
-            
-            <Button variant="outline" size="sm" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              <span>Filter by Date</span>
-            </Button>
           </div>
 
-          {/* Timeline Content */}
-          <TabsContent value={filter} className="mt-6 relative">
+          {/* Events Tab */}
+          <TabsContent value="events" className="mt-6 relative space-y-6">
+            <div className="flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="all" onClick={() => setFilter("all")}>All Events</TabsTrigger>
+                <TabsTrigger value="snapshot" onClick={() => setFilter("snapshot")}>Snapshots</TabsTrigger>
+                <TabsTrigger value="deployment" onClick={() => setFilter("deployment")}>Deployments</TabsTrigger>
+                <TabsTrigger value="config" onClick={() => setFilter("config")}>Configurations</TabsTrigger>
+              </TabsList>
+            </div>
+            
             <div className="timeline-connector -z-10"></div>
             
             <div className="space-y-8">
@@ -153,7 +321,8 @@ export default function Timeline() {
                   
                   <Card className={`border-l-4 ${
                     event.status === "successful" ? "border-l-green-500" : "border-l-red-500"
-                  }`}>
+                  } hover:shadow-md transition-all ${selectedTimePoint === event.timestamp ? 'ring-2 ring-primary' : ''}`}
+                  onClick={() => handleTimePointSelect(event.timestamp)}>
                     <CardHeader className="py-3 px-4">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -189,6 +358,24 @@ export default function Timeline() {
             <div className="mt-6 text-center">
               <Button variant="outline">Load More</Button>
             </div>
+          </TabsContent>
+          
+          {/* Capsules Tab */}
+          <TabsContent value="capsules" className="mt-6">
+            <CapsuleList 
+              capsules={capsules}
+              selectedTimePoint={selectedTimePoint}
+              onSelectTimePoint={handleTimePointSelect}
+            />
+          </TabsContent>
+          
+          {/* Files Tab */}
+          <TabsContent value="files" className="mt-6">
+            <FileVersions 
+              files={fileVersions}
+              selectedTimePoint={selectedTimePoint}
+              onSelectTimePoint={handleTimePointSelect}
+            />
           </TabsContent>
         </Tabs>
       </div>
