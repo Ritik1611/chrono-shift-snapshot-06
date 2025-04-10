@@ -44,7 +44,7 @@
     --sidebar-border: 214 188 250;
     --sidebar-ring: 110 89 165;
 
-    /* Time travel specific variables */
+    /* Time travel specific variables - improved color scheme */
     --chrono-primary: 110 89 165;
     --chrono-secondary: 155 135 245;
     --chrono-accent: 214 188 250;
@@ -174,6 +174,91 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  
+  /* New time travel animations */
+  .time-warp {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .time-warp::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(155,135,245,0) 0%, rgba(155,135,245,0.2) 50%, rgba(155,135,245,0) 100%);
+    z-index: 1;
+    transform: translateX(-100%);
+    animation: time-warp 3s ease-in-out infinite;
+  }
+  
+  @keyframes time-warp {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .time-pulse {
+    animation: time-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes time-pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  .chrono-spin {
+    animation: chrono-spin 20s linear infinite;
+  }
+  
+  @keyframes chrono-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .time-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .time-shimmer::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.1) 50%,
+      rgba(255,255,255,0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shimmer 6s linear infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-30%) rotate(30deg);
+    }
+    100% {
+      transform: translateX(30%) rotate(30deg);
     }
   }
 }

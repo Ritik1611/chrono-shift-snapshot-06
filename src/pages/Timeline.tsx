@@ -4,7 +4,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, Clock, CloudLightning, FileText, History, XCircle, Hourglass } from "lucide-react";
+import { Calendar, CheckCircle, Clock, CloudLightning, FileText, History, XCircle, Hourglass, Sparkles } from "lucide-react";
 import { TimeAxis } from "@/components/timeline/TimeAxis";
 import { CapsuleList } from "@/components/timeline/CapsuleList";
 import { FileVersions } from "@/components/timeline/FileVersions";
@@ -226,6 +226,8 @@ export default function Timeline() {
         {/* Header with time travel theme */}
         <div className="relative z-10 mb-8">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-lg -z-10 blur-xl"></div>
+          <div className="absolute -top-12 -left-12 w-32 h-32 bg-primary/20 rounded-full blur-xl opacity-60 time-pulse"></div>
+          <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-secondary/20 rounded-full blur-xl opacity-60 time-pulse"></div>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-indigo-500 text-transparent bg-clip-text">
@@ -242,19 +244,19 @@ export default function Timeline() {
               </Button>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="secondary" size="sm" className="gap-2">
-                    <Hourglass className="h-4 w-4" />
+                  <Button variant="secondary" size="sm" className="gap-2 time-warp">
+                    <Hourglass className="h-4 w-4 chrono-spin" />
                     <span>Time Controls</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="sm:max-w-md">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-semibold">Chrono Control Panel</h3>
+                      <h3 className="text-xl font-semibold time-gradient-text">Chrono Control Panel</h3>
                       <p className="text-sm text-muted-foreground">Manage your time travel operations</p>
                     </div>
                     <div className="space-y-4">
-                      <div>
+                      <div className="time-shimmer">
                         <h4 className="text-sm font-medium mb-2">Create Time Capsule</h4>
                         <div className="space-y-2">
                           <input 
@@ -262,18 +264,18 @@ export default function Timeline() {
                             placeholder="Capsule Name"
                             className="w-full px-3 py-2 border border-input bg-background rounded-md" 
                           />
-                          <Button className="w-full">Create Capsule at Current Time Point</Button>
+                          <Button className="w-full time-warp">Create Capsule at Current Time Point</Button>
                         </div>
                       </div>
                       
-                      <div>
+                      <div className="time-shimmer">
                         <h4 className="text-sm font-medium mb-2">Jump to Time Point</h4>
                         <div className="space-y-2">
                           <input 
                             type="datetime-local" 
                             className="w-full px-3 py-2 border border-input bg-background rounded-md" 
                           />
-                          <Button variant="secondary" className="w-full">Time Jump</Button>
+                          <Button variant="secondary" className="w-full time-warp">Time Jump</Button>
                         </div>
                       </div>
                     </div>
@@ -295,9 +297,9 @@ export default function Timeline() {
         <Tabs defaultValue="events" value={activeTab} onValueChange={setActiveTab}>
           <div className="flex items-center justify-between">
             <TabsList className="grid grid-cols-3 w-[400px]">
-              <TabsTrigger value="events">Events</TabsTrigger>
-              <TabsTrigger value="capsules">Capsules</TabsTrigger>
-              <TabsTrigger value="files">File Versions</TabsTrigger>
+              <TabsTrigger value="events" className="data-[state=active]:time-shimmer">Events</TabsTrigger>
+              <TabsTrigger value="capsules" className="data-[state=active]:time-shimmer">Capsules</TabsTrigger>
+              <TabsTrigger value="files" className="data-[state=active]:time-shimmer">File Versions</TabsTrigger>
             </TabsList>
           </div>
 
@@ -317,12 +319,17 @@ export default function Timeline() {
             <div className="space-y-8">
               {filteredEvents.map((event) => (
                 <div key={event.id} className="relative pl-10 animate-fade-in" style={{ animationDelay: `${event.id * 100}ms` }}>
-                  <div className="timeline-dot"></div>
+                  <div className="timeline-dot">
+                    {selectedTimePoint === event.timestamp && (
+                      <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-75"></span>
+                    )}
+                  </div>
                   
-                  <Card className={`border-l-4 ${
-                    event.status === "successful" ? "border-l-green-500" : "border-l-red-500"
-                  } hover:shadow-md transition-all ${selectedTimePoint === event.timestamp ? 'ring-2 ring-primary' : ''}`}
-                  onClick={() => handleTimePointSelect(event.timestamp)}>
+                  <Card 
+                    className={`border-l-4 ${
+                      event.status === "successful" ? "border-l-green-500" : "border-l-red-500"
+                    } hover:shadow-md transition-all ${selectedTimePoint === event.timestamp ? 'ring-2 ring-primary time-shimmer' : ''}`}
+                    onClick={() => handleTimePointSelect(event.timestamp)}>
                     <CardHeader className="py-3 px-4">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -356,7 +363,7 @@ export default function Timeline() {
             )}
             
             <div className="mt-6 text-center">
-              <Button variant="outline">Load More</Button>
+              <Button variant="outline" className="time-shimmer">Load More</Button>
             </div>
           </TabsContent>
           
