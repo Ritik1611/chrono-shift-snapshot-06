@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -18,8 +18,17 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   
+  useEffect(() => {
+    // Check if user is logged in
+    const currentUser = sessionStorage.getItem("currentUser");
+    if (!currentUser) {
+      navigate("/");
+    }
+  }, [navigate]);
+  
   const handleLogout = () => {
-    // In a real app, clear auth tokens here
+    // Clear user session
+    sessionStorage.removeItem("currentUser");
     navigate("/");
   };
   

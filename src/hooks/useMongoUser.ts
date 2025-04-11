@@ -2,15 +2,24 @@
 import { useState, useEffect } from 'react';
 import { mongoService } from '../services/mongoService';
 
-export function useMongoUser(username: string) {
+export function useMongoUser() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
+        
+        // Get current user from session storage
+        const username = sessionStorage.getItem("currentUser");
+        
+        if (!username) {
+          setError('User not logged in');
+          return;
+        }
+        
         const userData = await mongoService.getUserByUsername(username);
         
         if (userData) {
@@ -28,11 +37,17 @@ export function useMongoUser(username: string) {
     };
 
     fetchUser();
-  }, [username]);
+  }, []);
 
   const updateUserProfile = async (userData: any) => {
     try {
       setIsLoading(true);
+      const username = sessionStorage.getItem("currentUser");
+      
+      if (!username) {
+        return { success: false, message: 'User not logged in' };
+      }
+      
       const updatedUser = await mongoService.updateUser(username, userData);
       
       if (updatedUser) {
@@ -53,6 +68,12 @@ export function useMongoUser(username: string) {
   const updateUserPassword = async (currentPassword: string, newPassword: string) => {
     try {
       setIsLoading(true);
+      const username = sessionStorage.getItem("currentUser");
+      
+      if (!username) {
+        return { success: false, message: 'User not logged in' };
+      }
+      
       const success = await mongoService.updatePassword(username, currentPassword, newPassword);
       
       if (success) {

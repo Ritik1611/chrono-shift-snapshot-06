@@ -16,17 +16,60 @@ const userCollection: User[] = [
     username: "john_doe",
     email: "john.doe@example.com",
     name: "John Doe",
-    organization: "Acme Corp"
+    organization: "Acme Corp",
+    password: "password123" // In a real app, this would be a hashed password
   },
   {
     username: "jane_smith",
     email: "jane.smith@example.com",
     name: "Jane Smith",
-    organization: "Tech Solutions"
+    organization: "Tech Solutions",
+    password: "password123" // In a real app, this would be a hashed password
   }
 ];
 
 export const mongoService = {
+  // Authenticate user (simulate MongoDB query)
+  authenticateUser: async (email: string, password: string): Promise<Omit<User, 'password'> | null> => {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 700));
+    
+    const user = userCollection.find(u => u.email === email && u.password === password);
+    
+    if (!user) return null;
+    
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  },
+  
+  // Get user by email (simulate MongoDB query)
+  getUserByEmail: async (email: string): Promise<Omit<User, 'password'> | null> => {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const user = userCollection.find(u => u.email === email);
+    
+    if (!user) return null;
+    
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  },
+  
+  // Create new user (simulate MongoDB insert)
+  createUser: async (userData: User): Promise<Omit<User, 'password'> | null> => {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Add user to collection
+    userCollection.push(userData);
+    
+    // Return created user without password
+    const { password: _, ...userWithoutPassword } = userData;
+    return userWithoutPassword;
+  },
+  
   // Simulate getting user information from MongoDB
   getUserByUsername: async (username: string): Promise<User | null> => {
     // Simulate network delay
@@ -62,11 +105,13 @@ export const mongoService = {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    // In a real app, you would verify the current password against a hash
-    // and store the new password as a hash (NEVER in plain text)
-    
     const userIndex = userCollection.findIndex(u => u.username === username);
     if (userIndex === -1) return false;
+    
+    // Verify current password
+    if (userCollection[userIndex].password !== currentPassword) {
+      return false;
+    }
     
     // Simulate password update
     userCollection[userIndex].password = newPassword;
